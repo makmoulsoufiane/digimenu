@@ -58,35 +58,35 @@ Only the following modules must be implemented.
 
 ### Menu Management
 
-* Create Menu
-* Update Menu
-* Delete Menu
-* List Menus
+- Create Menu
+- Update Menu
+- Delete Menu
+- List Menus
 
 ### Menu Item Management
 
-* Create Menu Item
-* Update Menu Item
-* Delete Menu Item
-* List Menu Items
-* Filter Items by Menu
-* Manage Product Availability
+- Create Menu Item
+- Update Menu Item
+- Delete Menu Item
+- List Menu Items
+- Filter Items by Menu
+- Manage Product Availability
 
 ### Public Interface
 
-* View Menus
-* View Menu Items
-* View Product Details
+- View Menus
+- View Menu Items
+- View Product Details
 
 ### Administration Interface
 
-* Manage Menus
-* Manage Menu Items
+- Manage Menus
+- Manage Menu Items
 
 ### REST API
 
-* CRUD Menu
-* CRUD Menu Items
+- CRUD Menu
+- CRUD Menu Items
 
 ---
 
@@ -94,19 +94,19 @@ Only the following modules must be implemented.
 
 The following modules are not part of the MVP:
 
-* Authentication
-* Manager Management
-* Waiter Management
-* Restaurant Tables
-* Customer Management
-* Visits
-* Orders
-* Reviews
-* QR Code Generation
-* Notifications
-* Statistics
-* Payments
-* Dashboard
+- Authentication
+- Manager Management
+- Waiter Management
+- Restaurant Tables
+- Customer Management
+- Visits
+- Orders
+- Reviews
+- QR Code Generation
+- Notifications
+- Statistics
+- Payments
+- Dashboard
 
 ---
 
@@ -114,31 +114,31 @@ The following modules are not part of the MVP:
 
 ### Frontend
 
-* React
-* Vite
-* Tailwind CSS
-* Axios
-* React Router
+- React
+- Vite
+- Tailwind CSS
+- Axios
+- React Router
 
 ### Backend
 
-* Laravel
-* REST API
-* Controllers
-* Models
-* Form Requests
-* Migrations
+- Laravel
+- REST API
+- Controllers
+- Models
+- Form Requests
+- Migrations
 
 ### Database
 
-* MySQL
+- MySQL
 
 ### Tools
 
-* Git
-* GitHub
-* VS Code
-* Postman / Insomnia
+- Git
+- GitHub
+- VS Code
+- Postman / Insomnia
 
 ---
 
@@ -146,23 +146,23 @@ The following modules are not part of the MVP:
 
 The complete system is designed around the following entities:
 
-* Manager
-* Menu
-* Menu_items
-* Waiter
-* RestaurantTable
-* Customer
-* Visit
-* Order
-* Order_items
-* Review
+- Manager
+- Menu
+- Menu_items
+- Waiter
+- RestaurantTable
+- Customer
+- Visit
+- Order
+- Order_items
+- Review
 
 Important:
 
 Only the following entities are required for the MVP:
 
-* Menu
-* Menu_items
+- Menu
+- Menu_items
 
 All other entities belong to future versions.
 
@@ -210,14 +210,14 @@ A visit can receive a customer review after completion.
 
 The MVP is considered complete when:
 
-* Menus can be created, updated, deleted, and listed.
-* Menu items can be created, updated, deleted, and listed.
-* Menu items can be filtered by menu.
-* Public users can browse menus and products.
-* Administrators can manage menus and products.
-* The API works correctly.
-* Data validation is implemented.
-* Source code is managed with Git.
+- Menus can be created, updated, deleted, and listed.
+- Menu items can be created, updated, deleted, and listed.
+- Menu items can be filtered by menu.
+- Public users can browse menus and products.
+- Administrators can manage menus and products.
+- The API works correctly.
+- Data validation is implemented.
+- Source code is managed with Git.
 
 ---
 
@@ -225,46 +225,46 @@ The MVP is considered complete when:
 
 ### Version 1 (MVP)
 
-* Menu
-* Menu Items
-* Public Menu Interface
-* Administration Interface
-* REST API
+- Menu
+- Menu Items
+- Public Menu Interface
+- Administration Interface
+- REST API
 
 ### Version 2
 
-* Authentication
-* Manager Module
+- Authentication
+- Manager Module
 
 ### Version 3
 
-* Restaurant Tables
-* Customer
-* Visit
+- Restaurant Tables
+- Customer
+- Visit
 
 ### Version 4
 
-* Order
-* Order Items
+- Order
+- Order Items
 
 ### Version 5
 
-* Waiter Management
+- Waiter Management
 
 ### Version 6
 
-* Reviews
+- Reviews
 
 ---
 
 ## 11. Instructions for AI Coding Assistants
 
-* Read this document before coding.
-* Develop only the requested version.
-* Respect the MVP scope.
-* Do not implement future modules before validation.
-* Follow Laravel conventions.
-* Use reusable React components.
-* Keep the architecture simple.
-* Avoid overengineering.
-* Create database migrations before developing the UI.
+- Read this document before coding.
+- Develop only the requested version.
+- Respect the MVP scope.
+- Do not implement future modules before validation.
+- Follow Laravel conventions.
+- Use reusable React components.
+- Keep the architecture simple.
+- Avoid overengineering.
+- Create database migrations before developing the UI.
