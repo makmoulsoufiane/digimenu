@@ -1,15 +1,7 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 
 function App() {
-
-
-  return (
-    <>
-    </>
-  )
+  return <AdminDashboardPage />
 }
 
 export default App
