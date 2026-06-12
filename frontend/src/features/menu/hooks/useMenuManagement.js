@@ -40,6 +40,15 @@ export default function useMenuManagement() {
     [items],
   )
 
+  const itemNamesByMenu = useMemo(
+    () =>
+      items.reduce((names, item) => {
+        names[item.menuId] = [...(names[item.menuId] ?? []), item.name]
+        return names
+      }, {}),
+    [items],
+  )
+
   function resetFilters() {
     setQuery('')
     setAvailableOnly(false)
@@ -86,10 +95,13 @@ export default function useMenuManagement() {
 
   function createItem(itemData) {
     const id = getNextId(items)
+    const menuId = itemData.menuId ?? selectedMenuId
+
     setItems((current) => [
       ...current,
-      { id, menuId: selectedMenuId, ...itemData },
+      { id, ...itemData, menuId },
     ])
+    selectMenu(menuId)
   }
 
   function updateItem(itemId, itemData) {
@@ -98,6 +110,7 @@ export default function useMenuManagement() {
         item.id === itemId ? { ...item, ...itemData } : item,
       ),
     )
+    selectMenu(itemData.menuId)
   }
 
   function deleteItem(itemId) {
@@ -118,6 +131,7 @@ export default function useMenuManagement() {
     selectedMenuItems,
     visibleItems,
     itemCounts,
+    itemNamesByMenu,
     query,
     availableOnly,
     setQuery,

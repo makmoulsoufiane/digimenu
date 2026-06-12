@@ -5,16 +5,16 @@ import Icon from './Icon'
 const EMPTY_FORM = {
   name: '',
   description: '',
-  category: '',
+  menuId: '',
   price: '',
   available: true,
   image: '',
 }
 
-function getInitialForm(item) {
+function getInitialForm(item, selectedMenuId) {
   return item
-    ? { ...item, price: String(item.price) }
-    : { ...EMPTY_FORM }
+    ? { ...item, menuId: String(item.menuId), price: String(item.price) }
+    : { ...EMPTY_FORM, menuId: String(selectedMenuId ?? '') }
 }
 
 function Field({ label, children }) {
@@ -31,11 +31,15 @@ function Field({ label, children }) {
 function MenuItemFormModal({
   mode,
   initialItem,
-  existingNames,
+  menus,
+  selectedMenuId,
+  itemNamesByMenu,
   onClose,
   onSubmit,
 }) {
-  const [form, setForm] = useState(() => getInitialForm(initialItem))
+  const [form, setForm] = useState(() =>
+    getInitialForm(initialItem, selectedMenuId),
+  )
   const [error, setError] = useState('')
   const nameInputRef = useRef(null)
   const dialogRef = useModalBehavior({
@@ -65,16 +69,16 @@ function MenuItemFormModal({
   function handleSubmit(event) {
     event.preventDefault()
     const name = form.name.trim()
-    const category = form.category.trim()
+    const menuId = Number(form.menuId)
     const price = Number(form.price)
 
-    if (!name || !category || !form.description.trim()) {
-      setError('Name, description, and category are required.')
+    if (!name || !menuId || !form.description.trim()) {
+      setError('Name, description, and menu category are required.')
       return
     }
 
     if (
-      existingNames.some(
+      (itemNamesByMenu[menuId] ?? []).some(
         (value) => value.toLowerCase() === name.toLowerCase(),
       )
     ) {
@@ -89,9 +93,10 @@ function MenuItemFormModal({
     }
 
     onSubmit({
+      menuId,
       name,
       description: form.description.trim(),
-      category,
+      category: menus.find((menu) => menu.id === menuId)?.name ?? '',
       price,
       available: form.available,
       image: form.image,
@@ -181,16 +186,23 @@ function MenuItemFormModal({
             </Field>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Category">
-                <input
-                  value={form.category}
+              <Field label="Menu category">
+                <select
+                  value={form.menuId}
                   onChange={(event) =>
-                    updateField('category', event.target.value)
+                    updateField('menuId', event.target.value)
                   }
-                  placeholder="e.g. Main course"
-                  maxLength={60}
                   className={inputClass}
-                />
+                >
+                  <option value="" disabled>
+                    Select a menu
+                  </option>
+                  {menus.map((menu) => (
+                    <option key={menu.id} value={menu.id}>
+                      {menu.name}
+                    </option>
+                  ))}
+                </select>
               </Field>
               <Field label="Price">
                 <input

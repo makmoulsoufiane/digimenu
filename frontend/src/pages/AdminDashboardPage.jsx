@@ -251,9 +251,18 @@ function AdminDashboardPage() {
           key={`${itemForm.mode}-${itemForm.item?.id ?? 'new'}`}
           mode={itemForm.mode}
           initialItem={itemForm.item}
-          existingNames={menuManager.selectedMenuItems
-            .filter((item) => item.id !== itemForm.item?.id)
-            .map((item) => item.name)}
+          menus={menuManager.menus}
+          selectedMenuId={menuManager.selectedMenu?.id}
+          itemNamesByMenu={Object.fromEntries(
+            Object.entries(menuManager.itemNamesByMenu).map(
+              ([menuId, names]) => [
+                menuId,
+                Number(menuId) === itemForm.item?.menuId
+                  ? names.filter((name) => name !== itemForm.item?.name)
+                  : names,
+              ],
+            ),
+          )}
           onClose={() => setItemForm(null)}
           onSubmit={saveItem}
         />
