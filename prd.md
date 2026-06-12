@@ -122,16 +122,14 @@ The following modules are not part of the MVP:
 
 ### Backend
 
-- Laravel
+- Node.js
+- Express
+- Prisma
 - REST API
-- Controllers
-- Models
-- Form Requests
-- Migrations
 
 ### Database
 
-- MySQL
+- PostgreSQL
 
 ### Tools
 
