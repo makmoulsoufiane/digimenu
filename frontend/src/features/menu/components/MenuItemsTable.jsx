@@ -1,4 +1,5 @@
-import Icon from './Icon'
+import Icon from '../../../shared/components/Icon'
+import { formatCurrency } from '../../../shared/utils/formatCurrency'
 
 function AvailabilityToggle({ checked, itemName, onChange }) {
   return (
@@ -113,7 +114,7 @@ function MenuItemsTable({
                   </span>
                 </td>
                 <td className="px-4 py-4 text-sm font-bold">
-                  ${item.price.toFixed(2)}
+                  {formatCurrency(item.price)}
                 </td>
                 <td className="px-4 py-4">
                   <AvailabilityToggle
@@ -148,7 +149,7 @@ function MenuItemsTable({
                   <div>
                     <h3 className="font-bold">{item.name}</h3>
                     <p className="mt-1 text-sm font-bold text-[#154f65]">
-                      ${item.price.toFixed(2)}
+                      {formatCurrency(item.price)}
                     </p>
                   </div>
                   <AvailabilityToggle

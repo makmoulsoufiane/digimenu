@@ -28,6 +28,19 @@ const paths = {
     </>
   ),
   filter: <path d="M4 5h16l-6 7v5l-4 2v-7Z" />,
+  eye: (
+    <>
+      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  eyeOff: (
+    <>
+      <path d="m3 3 18 18" />
+      <path d="M10.6 6.2A10.5 10.5 0 0 1 12 6c6.5 0 10 6 10 6a18 18 0 0 1-2.1 2.8" />
+      <path d="M6.2 6.2C3.5 8 2 12 2 12s3.5 6 10 6c1.7 0 3.2-.4 4.4-1" />
+    </>
+  ),
   glass: (
     <>
       <path d="M8 3h8l-1 6a3 3 0 0 1-6 0Z" />
@@ -40,6 +53,26 @@ const paths = {
       <path d="M10 17l5-5-5-5" />
       <path d="M15 12H3" />
       <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect width="16" height="12" x="4" y="10" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+      <path d="M12 14v4" />
+    </>
+  ),
+  login: (
+    <>
+      <path d="M14 8l4 4-4 4" />
+      <path d="M18 12H7" />
+      <path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5" />
+    </>
+  ),
+  mail: (
+    <>
+      <rect width="20" height="16" x="2" y="4" rx="2" />
+      <path d="m22 7-10 6L2 7" />
     </>
   ),
   menu: (

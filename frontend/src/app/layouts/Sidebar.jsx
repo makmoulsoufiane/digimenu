@@ -1,8 +1,10 @@
-import Icon from './Icon'
+import { NavLink } from 'react-router-dom'
+import Icon from '../../shared/components/Icon'
+import { ROUTES } from '../../shared/constants/routes'
 
 const navigation = [
-  { label: 'Overview', icon: 'dashboard' },
-  { label: 'Menus', icon: 'menus', active: true },
+  { label: 'Overview', icon: 'dashboard', to: ROUTES.dashboard, end: true },
+  { label: 'Menus', icon: 'menus', to: ROUTES.menus },
 ]
 
 function SidebarContent({ onClose }) {
@@ -21,7 +23,7 @@ function SidebarContent({ onClose }) {
           onClick={onClose}
           aria-label="Close navigation"
         >
-          <span className="text-2xl font-light">×</span>
+          <Icon name="close" size={20} />
         </button>
       </div>
 
@@ -31,18 +33,22 @@ function SidebarContent({ onClose }) {
         </p>
         <ul className="mt-3 space-y-1">
           {navigation.map((item) => (
-            <li key={item.label}>
-              <a
-                href="/"
-                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold transition ${
-                  item.active
-                    ? 'bg-white/10 text-white shadow-[inset_3px_0_0_#7dd3b0]'
-                    : 'text-[#c4d9e0] hover:bg-white/5 hover:text-white'
-                }`}
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                end={item.end}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold transition ${
+                    isActive
+                      ? 'bg-white/10 text-white shadow-[inset_3px_0_0_#7dd3b0]'
+                      : 'text-[#c4d9e0] hover:bg-white/5 hover:text-white'
+                  }`
+                }
               >
                 <Icon name={item.icon} size={17} />
                 {item.label}
-              </a>
+              </NavLink>
             </li>
           ))}
         </ul>

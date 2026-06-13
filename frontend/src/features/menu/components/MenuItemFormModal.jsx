@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
-import useModalBehavior from '../hooks/useModalBehavior'
-import Icon from './Icon'
+import useModalBehavior from '../../../shared/hooks/useModalBehavior'
+import Icon from '../../../shared/components/Icon'
 
 const EMPTY_FORM = {
   name: '',

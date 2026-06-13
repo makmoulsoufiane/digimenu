@@ -1,5 +1,5 @@
-import Icon from './Icon'
-import { formatMenuSchedule } from '../features/menu/utils/menuUtils'
+import Icon from '../../../shared/components/Icon'
+import { formatMenuSchedule } from '../utils/menuUtils'
 
 function MenuCard({
   menu,

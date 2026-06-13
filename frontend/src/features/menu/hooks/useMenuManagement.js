@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
-import { initialMenuItems, initialMenus } from '../data/menuData'
+import {
+  getInitialMenuItems,
+  getInitialMenus,
+} from '../services/menuService'
 import { getNextId, normalizeText } from '../utils/menuUtils'
 
-export default function useMenuManagement() {
-  const [menus, setMenus] = useState(initialMenus)
-  const [items, setItems] = useState(initialMenuItems)
-  const [selectedMenuId, setSelectedMenuId] = useState(initialMenus[1].id)
+export default function useMenuManagement(selectedMenuId) {
+  const [menus, setMenus] = useState(getInitialMenus)
+  const [items, setItems] = useState(getInitialMenuItems)
   const [query, setQuery] = useState('')
   const [availableOnly, setAvailableOnly] = useState(false)
 
@@ -54,11 +56,6 @@ export default function useMenuManagement() {
     setAvailableOnly(false)
   }
 
-  function selectMenu(menuId) {
-    setSelectedMenuId(menuId)
-    resetFilters()
-  }
-
   function createMenu(menuData) {
     const id = getNextId(menus)
     const menu = {
@@ -69,7 +66,7 @@ export default function useMenuManagement() {
     }
 
     setMenus((current) => [...current, menu])
-    selectMenu(id)
+    return menu
   }
 
   function updateMenu(menuId, menuData) {
@@ -81,15 +78,8 @@ export default function useMenuManagement() {
   }
 
   function deleteMenu(menuId) {
-    const remainingMenus = menus.filter((menu) => menu.id !== menuId)
-
-    setMenus(remainingMenus)
+    setMenus((current) => current.filter((menu) => menu.id !== menuId))
     setItems((current) => current.filter((item) => item.menuId !== menuId))
-
-    if (selectedMenuId === menuId) {
-      setSelectedMenuId(remainingMenus[0]?.id ?? null)
-    }
-
     resetFilters()
   }
 
@@ -101,7 +91,7 @@ export default function useMenuManagement() {
       ...current,
       { id, ...itemData, menuId },
     ])
-    selectMenu(menuId)
+    return menuId
   }
 
   function updateItem(itemId, itemData) {
@@ -110,7 +100,7 @@ export default function useMenuManagement() {
         item.id === itemId ? { ...item, ...itemData } : item,
       ),
     )
-    selectMenu(itemData.menuId)
+    return itemData.menuId
   }
 
   function deleteItem(itemId) {
@@ -136,7 +126,7 @@ export default function useMenuManagement() {
     availableOnly,
     setQuery,
     setAvailableOnly,
-    selectMenu,
+    resetFilters,
     createMenu,
     updateMenu,
     deleteMenu,

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
-import { WEEK_DAYS } from '../features/menu/data/menuData'
-import useModalBehavior from '../hooks/useModalBehavior'
-import Icon from './Icon'
+import { WEEK_DAYS } from '../data/menuData'
+import useModalBehavior from '../../../shared/hooks/useModalBehavior'
+import Icon from '../../../shared/components/Icon'
 
 function getInitialForm(menu) {
   return {
