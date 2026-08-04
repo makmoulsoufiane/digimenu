@@ -1,15 +1,50 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
-  getInitialMenuItems,
-  getInitialMenus,
+  createMenu as createMenuRequest,
+  createMenuItem,
+  deleteMenu as deleteMenuRequest,
+  deleteMenuItem,
+  getMenus,
+  toggleMenuItemAvailability,
+  updateMenu as updateMenuRequest,
+  updateMenuItem,
 } from '../services/menuService'
-import { getNextId, normalizeText } from '../utils/menuUtils'
+import { normalizeText } from '../utils/menuUtils'
 
 export default function useMenuManagement(selectedMenuId) {
-  const [menus, setMenus] = useState(getInitialMenus)
-  const [items, setItems] = useState(getInitialMenuItems)
+  const [menus, setMenus] = useState([])
+  const [items, setItems] = useState([])
   const [query, setQuery] = useState('')
   const [availableOnly, setAvailableOnly] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadMenus() {
+      try {
+        setIsLoading(true)
+        setError('')
+        const data = await getMenus()
+
+        if (isMounted) {
+          setMenus(data.menus)
+          setItems(data.items)
+        }
+      } catch (loadError) {
+        if (isMounted) setError(loadError.message)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    loadMenus()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const selectedMenu = useMemo(
     () => menus.find((menu) => menu.id === selectedMenuId) ?? null,
@@ -56,67 +91,78 @@ export default function useMenuManagement(selectedMenuId) {
     setAvailableOnly(false)
   }
 
-  function createMenu(menuData) {
-    const id = getNextId(menus)
-    const menu = {
-      id,
-      ...menuData,
-      status: 'draft',
-      icon: 'menus',
-    }
+  async function createMenu(menuData) {
+    const createdMenu = await createMenuRequest(menuData)
+    const { items: menuItems = [], ...menu } = createdMenu
 
     setMenus((current) => [...current, menu])
+    setItems((current) => [...current, ...menuItems])
     return menu
   }
 
-  function updateMenu(menuId, menuData) {
+  async function updateMenu(menuId, menuData) {
+    const updatedMenu = await updateMenuRequest(menuId, menuData)
+    const { items: updatedItems = [], ...menu } = updatedMenu
+
     setMenus((current) =>
-      current.map((menu) =>
-        menu.id === menuId ? { ...menu, ...menuData } : menu,
+      current.map((currentMenu) =>
+        currentMenu.id === menuId ? menu : currentMenu,
       ),
     )
+    setItems((current) => [
+      ...current.filter((item) => item.menuId !== menuId),
+      ...updatedItems,
+    ])
+    return menu
   }
 
-  function deleteMenu(menuId) {
+  async function deleteMenu(menuId) {
+    await deleteMenuRequest(menuId)
     setMenus((current) => current.filter((menu) => menu.id !== menuId))
     setItems((current) => current.filter((item) => item.menuId !== menuId))
     resetFilters()
   }
 
-  function createItem(itemData) {
-    const id = getNextId(items)
-    const menuId = itemData.menuId ?? selectedMenuId
+  async function createItem(itemData) {
+    const createdItem = await createMenuItem({
+      ...itemData,
+      menuId: itemData.menuId ?? selectedMenuId,
+    })
 
-    setItems((current) => [
-      ...current,
-      { id, ...itemData, menuId },
-    ])
-    return menuId
+    setItems((current) => [...current, createdItem])
+    return createdItem.menuId
   }
 
-  function updateItem(itemId, itemData) {
+  async function updateItem(itemId, itemData) {
+    const updatedItem = await updateMenuItem(itemId, itemData)
+
     setItems((current) =>
       current.map((item) =>
-        item.id === itemId ? { ...item, ...itemData } : item,
+        item.id === itemId ? updatedItem : item,
       ),
     )
-    return itemData.menuId
+    return updatedItem.menuId
   }
 
-  function deleteItem(itemId) {
+  async function deleteItem(itemId) {
+    await deleteMenuItem(itemId)
     setItems((current) => current.filter((item) => item.id !== itemId))
   }
 
-  function toggleItemAvailability(itemId) {
+  async function toggleItemAvailability(itemId) {
+    const updatedItem = await toggleMenuItemAvailability(itemId)
+
     setItems((current) =>
       current.map((item) =>
-        item.id === itemId ? { ...item, available: !item.available } : item,
+        item.id === itemId ? updatedItem : item,
       ),
     )
   }
 
   return {
     menus,
+    isLoading,
+    error,
     selectedMenu,
     selectedMenuItems,
     visibleItems,

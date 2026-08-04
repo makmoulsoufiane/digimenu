@@ -23,41 +23,52 @@ function MenuPage() {
     navigate(ROUTES.menuDetails(id))
   }
 
-  function saveMenu(menuData) {
-    if (menuForm.mode === 'edit') {
-      menuManager.updateMenu(menuForm.menu.id, menuData)
-    } else {
-      const createdMenu = menuManager.createMenu(menuData)
-      selectMenu(createdMenu.id)
-    }
+  async function saveMenu(menuData) {
+    try {
+      if (menuForm.mode === 'edit') {
+        await menuManager.updateMenu(menuForm.menu.id, menuData)
+      } else {
+        const createdMenu = await menuManager.createMenu(menuData)
+        selectMenu(createdMenu.id)
+      }
 
-    setMenuForm(null)
+      setMenuForm(null)
+    } catch (error) {
+      window.alert(error.message)
+    }
   }
 
-  function saveItem(itemData) {
-    if (itemForm.mode === 'edit') {
-      menuManager.updateItem(itemForm.item.id, itemData)
-    } else {
-      menuManager.createItem(itemData)
-    }
+  async function saveItem(itemData) {
+    try {
+      const savedMenuId =
+        itemForm.mode === 'edit'
+          ? await menuManager.updateItem(itemForm.item.id, itemData)
+          : await menuManager.createItem(itemData)
 
-    if (itemData.menuId !== selectedMenuId) {
-      selectMenu(itemData.menuId)
-    }
+      if (savedMenuId !== selectedMenuId) {
+        selectMenu(savedMenuId)
+      }
 
-    setItemForm(null)
+      setItemForm(null)
+    } catch (error) {
+      window.alert(error.message)
+    }
   }
 
-  function confirmDelete() {
-    if (deleteTarget.type === 'menu') {
-      const deletingSelectedMenu = deleteTarget.record.id === selectedMenuId
-      menuManager.deleteMenu(deleteTarget.record.id)
-      if (deletingSelectedMenu) navigate(ROUTES.menus)
-    } else {
-      menuManager.deleteItem(deleteTarget.record.id)
-    }
+  async function confirmDelete() {
+    try {
+      if (deleteTarget.type === 'menu') {
+        const deletingSelectedMenu = deleteTarget.record.id === selectedMenuId
+        await menuManager.deleteMenu(deleteTarget.record.id)
+        if (deletingSelectedMenu) navigate(ROUTES.menus)
+      } else {
+        await menuManager.deleteItem(deleteTarget.record.id)
+      }
 
-    setDeleteTarget(null)
+      setDeleteTarget(null)
+    } catch (error) {
+      window.alert(error.message)
+    }
   }
 
   const deleteDescription =
@@ -90,6 +101,18 @@ function MenuPage() {
         </button>
       </section>
 
+      {menuManager.isLoading ? (
+        <section className="mt-7 rounded-xl border border-[#dbe3e6] bg-white px-6 py-12 text-center">
+          <p className="font-bold text-[#30464e]">Loading menus...</p>
+        </section>
+      ) : null}
+
+      {menuManager.error ? (
+        <section className="mt-7 rounded-xl border border-[#f0c5c5] bg-[#fff7f7] px-6 py-4 text-sm font-semibold text-[#9c3b3b]">
+          {menuManager.error}
+        </section>
+      ) : null}
+
       <section
         className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
         aria-label="Restaurant menus"
@@ -107,7 +130,7 @@ function MenuPage() {
         ))}
       </section>
 
-      {menuId && !menuManager.selectedMenu ? (
+      {menuId && !menuManager.isLoading && !menuManager.selectedMenu ? (
         <section className="mt-7 rounded-xl border border-dashed border-[#cbd7db] bg-white px-6 py-16 text-center">
           <h2 className="font-bold text-[#263940]">Menu not found</h2>
           <p className="mt-2 text-sm text-[#718087]">
@@ -184,7 +207,7 @@ function MenuPage() {
         </section>
       ) : null}
 
-      {!menuId && menuManager.menus.length > 0 ? (
+      {!menuId && !menuManager.isLoading && menuManager.menus.length > 0 ? (
         <section className="mt-7 rounded-xl border border-dashed border-[#cbd7db] bg-white px-6 py-12 text-center">
           <h2 className="font-bold text-[#263940]">Select a menu</h2>
           <p className="mt-2 text-sm text-[#718087]">
@@ -193,7 +216,7 @@ function MenuPage() {
         </section>
       ) : null}
 
-      {menuManager.menus.length === 0 ? (
+      {!menuManager.isLoading && menuManager.menus.length === 0 ? (
         <section className="mt-7 rounded-xl border border-dashed border-[#cbd7db] bg-white px-6 py-16 text-center">
           <h2 className="font-bold text-[#263940]">No menus yet</h2>
           <p className="mt-2 text-sm text-[#718087]">
