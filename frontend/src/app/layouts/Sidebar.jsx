@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../features/auth/useAuth'
 import Icon from '../../shared/components/Icon'
 import { ROUTES } from '../../shared/constants/routes'
 
@@ -8,6 +9,23 @@ const navigation = [
 ]
 
 function SidebarContent({ onClose }) {
+  const navigate = useNavigate()
+  const { logout, user } = useAuth()
+
+  async function handleLogout() {
+    await logout()
+    onClose?.()
+    navigate(ROUTES.login, { replace: true })
+  }
+
+  const initials =
+    user?.name
+      ?.split(' ')
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() ?? 'M'
+
   return (
     <div className="flex h-full flex-col bg-[#124b61] text-white">
       <div className="flex h-[72px] items-center justify-between border-b border-white/10 px-6">
@@ -65,14 +83,17 @@ function SidebarContent({ onClose }) {
       <div className="mt-auto border-t border-white/10 p-4">
         <div className="flex items-center gap-3">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/10 text-xs font-bold">
-            BL
+            {initials}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-bold">Bistro Lux</p>
+            <p className="truncate text-xs font-bold">
+              {user?.name ?? 'Manager'}
+            </p>
             <p className="mt-0.5 text-[10px] text-[#9fbdc8]">Manager account</p>
           </div>
           <button
             type="button"
+            onClick={handleLogout}
             className="grid h-9 w-9 place-items-center rounded-lg text-[#b9d0d8] hover:bg-white/10 hover:text-white"
             aria-label="Sign out"
           >

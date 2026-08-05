@@ -1,29 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api'
-
-async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  })
-
-  if (response.status === 204) return null
-
-  const data = await response.json().catch(() => null)
-
-  if (!response.ok) {
-    const validationMessage = data?.message ?? 'The menu request failed.'
-    throw new Error(validationMessage)
-  }
-
-  return data
-}
+import { apiRequest } from '../../../shared/services/apiClient'
 
 export async function getMenus() {
-  const data = await request('/menus')
+  const data = await apiRequest('/menus')
   const menus = data.menus ?? []
 
   return {
@@ -37,47 +15,47 @@ export async function getMenus() {
 }
 
 export function createMenu(menuData) {
-  return request('/menus', {
+  return apiRequest('/menus', {
     method: 'POST',
     body: JSON.stringify(menuData),
   })
 }
 
 export function updateMenu(menuId, menuData) {
-  return request(`/menus/${menuId}`, {
+  return apiRequest(`/menus/${menuId}`, {
     method: 'PUT',
     body: JSON.stringify(menuData),
   })
 }
 
 export function deleteMenu(menuId) {
-  return request(`/menus/${menuId}`, {
+  return apiRequest(`/menus/${menuId}`, {
     method: 'DELETE',
   })
 }
 
 export function createMenuItem(itemData) {
-  return request('/menu-items', {
+  return apiRequest('/menu-items', {
     method: 'POST',
     body: JSON.stringify(itemData),
   })
 }
 
 export function updateMenuItem(itemId, itemData) {
-  return request(`/menu-items/${itemId}`, {
+  return apiRequest(`/menu-items/${itemId}`, {
     method: 'PUT',
     body: JSON.stringify(itemData),
   })
 }
 
 export function deleteMenuItem(itemId) {
-  return request(`/menu-items/${itemId}`, {
+  return apiRequest(`/menu-items/${itemId}`, {
     method: 'DELETE',
   })
 }
 
 export function toggleMenuItemAvailability(itemId) {
-  return request(`/menu-items/${itemId}/availability`, {
+  return apiRequest(`/menu-items/${itemId}/availability`, {
     method: 'PATCH',
   })
 }

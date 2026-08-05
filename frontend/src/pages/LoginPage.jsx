@@ -1,15 +1,55 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { useAuth } from '../features/auth/useAuth'
 import Icon from '../shared/components/Icon'
 import { ROUTES } from '../shared/constants/routes'
 
 function LoginPage() {
   const navigate = useNavigate()
+  const { isAuthenticated, isCheckingAuth, login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    remember: false,
+  })
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(event) {
+  function handleChange(event) {
+    const { checked, name, type, value } = event.target
+
+    setFormData((current) => ({
+      ...current,
+      [name]: type === 'checkbox' ? checked : value,
+    }))
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault()
-    navigate(ROUTES.dashboard)
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      await login(formData)
+      navigate(ROUTES.dashboard, { replace: true })
+    } catch (loginError) {
+      setError(loginError.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (isCheckingAuth) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f5f7f9] text-[#124b61]">
+        <p className="text-sm font-bold">Checking session...</p>
+      </main>
+    )
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={ROUTES.dashboard} replace />
   }
 
   return (
@@ -72,6 +112,8 @@ function LoginPage() {
                     name="email"
                     autoComplete="email"
                     required
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="name@restaurant.com"
                     className="h-[76px] w-full rounded-lg border border-[#bcc8ce] bg-[#f8fafc] pl-14 pr-5 text-lg outline-none transition placeholder:font-semibold placeholder:text-[#c1c9ce] focus:border-[#17647e] focus:ring-2 focus:ring-[#17647e]/10"
                   />
@@ -102,6 +144,8 @@ function LoginPage() {
                     autoComplete="current-password"
                     required
                     minLength={6}
+                    value={formData.password}
+                    onChange={handleChange}
                     placeholder="••••••••"
                     className="h-[76px] w-full rounded-lg border border-[#bcc8ce] bg-[#f8fafc] px-14 text-lg outline-none transition placeholder:font-bold placeholder:tracking-[0.2em] placeholder:text-[#b9c4c9] focus:border-[#17647e] focus:ring-2 focus:ring-[#17647e]/10"
                   />
@@ -122,16 +166,25 @@ function LoginPage() {
                 <input
                   type="checkbox"
                   name="remember"
+                  checked={formData.remember}
+                  onChange={handleChange}
                   className="h-6 w-6 rounded border-[#bbc8cd] accent-[#17647e]"
                 />
                 Remember this device for 30 days
               </label>
 
+              {error && (
+                <p className="mt-6 rounded-lg border border-[#f0c3c0] bg-[#fff5f4] px-4 py-3 text-sm font-semibold text-[#9b2c25]">
+                  {error}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="mt-7 flex h-[68px] w-full items-center justify-center gap-3 rounded-lg bg-[#17647e] text-base font-bold text-white shadow-sm transition hover:bg-[#104f66] focus:outline-none focus:ring-4 focus:ring-[#17647e]/20"
+                disabled={isSubmitting}
+                className="mt-7 flex h-[68px] w-full items-center justify-center gap-3 rounded-lg bg-[#17647e] text-base font-bold text-white shadow-sm transition hover:bg-[#104f66] focus:outline-none focus:ring-4 focus:ring-[#17647e]/20 disabled:cursor-not-allowed disabled:bg-[#7fa7b5]"
               >
-                Sign In
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
                 <Icon name="login" size={23} />
               </button>
             </form>

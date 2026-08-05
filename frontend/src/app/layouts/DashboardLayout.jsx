@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { useAuth } from '../../features/auth/useAuth'
 import Icon from '../../shared/components/Icon'
 import { ROUTES } from '../../shared/constants/routes'
 import Sidebar from './Sidebar'
@@ -12,6 +13,7 @@ const pageTitles = {
 function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
+  const { user } = useAuth()
   const pageTitle =
     pageTitles[location.pathname] ??
     (location.pathname.startsWith(`${ROUTES.menus}/`) ? 'Menus' : 'Dashboard')
@@ -55,7 +57,12 @@ function DashboardLayout() {
               className="ml-1 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#1b6079] text-sm font-bold text-white"
               aria-label="Manager profile"
             >
-              JD
+              {user?.name
+                ?.split(' ')
+                .map((part) => part[0])
+                .join('')
+                .slice(0, 2)
+                .toUpperCase() ?? 'M'}
             </div>
           </div>
         </header>

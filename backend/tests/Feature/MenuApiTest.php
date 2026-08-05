@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Menu;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class MenuApiTest extends TestCase
@@ -40,8 +42,53 @@ class MenuApiTest extends TestCase
             ->assertJsonPath('menus.0.items.0.menuId', $menu->id);
     }
 
+    public function test_menu_management_requires_authentication(): void
+    {
+        $this->postJson('/api/menus', [
+            'name' => 'Brunch',
+            'days' => ['Saturday'],
+        ])->assertUnauthorized();
+    }
+
+    public function test_manager_can_create_menu(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $this->postJson('/api/menus', [
+            'name' => 'Brunch',
+            'description' => 'Weekend favorites.',
+            'startTime' => '10:00',
+            'endTime' => '14:00',
+            'days' => ['Saturday', 'Sunday'],
+            'status' => 'active',
+            'icon' => 'sun',
+            'imageUrl' => '',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('name', 'Brunch');
+
+        $this->assertDatabaseHas('menus', [
+            'name' => 'Brunch',
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_non_manager_cannot_create_menu(): void
+    {
+        Sanctum::actingAs(User::factory()->create([
+            'role' => 'waiter',
+        ]));
+
+        $this->postJson('/api/menus', [
+            'name' => 'Brunch',
+            'days' => ['Saturday'],
+        ])->assertForbidden();
+    }
+
     public function test_menu_items_can_toggle_availability(): void
     {
+        Sanctum::actingAs(User::factory()->create());
+
         $menu = Menu::create([
             'name' => 'Dinner',
             'description' => 'Evening dishes.',
