@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['name', 'email', 'password', 'role'])]
@@ -21,6 +22,54 @@ class User extends Authenticatable
     public function isManager(): bool
     {
         return $this->role === 'manager';
+    }
+
+    public function isWaiter(): bool
+    {
+        return $this->role === 'waiter';
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->isManager() || $this->isWaiter();
+    }
+
+    public function managerProfile(): ?Manager
+    {
+        if (! $this->isManager()) {
+            return null;
+        }
+
+        return Manager::query()->firstOrCreate(
+            ['email' => $this->email],
+            [
+                'full_name' => $this->name,
+                'password_hash' => $this->password,
+            ],
+        );
+    }
+
+    public function waiterProfile(): ?Waiter
+    {
+        if (! $this->isWaiter()) {
+            return null;
+        }
+
+        $manager = Manager::query()->first()
+            ?? Manager::create([
+                'full_name' => 'DigiMenu Manager',
+                'email' => 'manager@digimenu.test',
+                'password_hash' => '',
+            ]);
+
+        return DB::transaction(fn (): Waiter => Waiter::query()->firstOrCreate(
+            ['email' => $this->email],
+            [
+                'manager_id' => $manager->id,
+                'first_name' => explode(' ', $this->name)[0] ?: $this->name,
+                'password_hash' => $this->password,
+            ],
+        ));
     }
 
     /**

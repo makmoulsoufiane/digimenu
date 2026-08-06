@@ -2,6 +2,8 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import DashboardLayout from '../layouts/DashboardLayout'
 import ProtectedRoute from '../../features/auth/ProtectedRoute'
 import { menuRoutes } from '../../features/menu/menu.routes'
+import CustomerOrderPage from '../../features/orders/CustomerOrderPage'
+import { orderRoutes } from '../../features/orders/order.routes'
 import DashboardPage from '../../pages/DashboardPage'
 import LoginPage from '../../pages/LoginPage'
 import NotFoundPage from '../../pages/NotFoundPage'
@@ -11,6 +13,10 @@ const router = createBrowserRouter([
   {
     path: ROUTES.login,
     element: <LoginPage />,
+  },
+  {
+    path: '/table/:tableCode',
+    element: <CustomerOrderPage />,
   },
   {
     element: <ProtectedRoute />,
@@ -24,6 +30,7 @@ const router = createBrowserRouter([
             element: <DashboardPage />,
           },
           ...menuRoutes,
+          ...orderRoutes,
         ],
       },
     ],

@@ -3,4 +3,6 @@ export const ROUTES = {
   dashboard: '/dashboard',
   menus: '/dashboard/menus',
   menuDetails: (menuId) => `/dashboard/menus/${menuId}`,
+  orders: '/dashboard/orders',
+  table: (tableCode) => `/table/${tableCode}`,
 }

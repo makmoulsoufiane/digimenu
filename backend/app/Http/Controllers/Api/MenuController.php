@@ -25,7 +25,10 @@ class MenuController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $menu = Menu::create($this->validatedMenuData($request));
+        $menu = Menu::create([
+            ...$this->validatedMenuData($request),
+            'manager_id' => $request->user()->managerProfile()->id,
+        ]);
 
         return response()->json($this->serializeMenu($menu->load('items')), 201);
     }

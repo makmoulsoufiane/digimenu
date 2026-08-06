@@ -46,7 +46,7 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_login_rejects_non_manager_accounts(): void
+    public function test_waiter_can_log_in(): void
     {
         User::factory()->create([
             'email' => 'waiter@digimenu.test',
@@ -57,8 +57,11 @@ class AuthTest extends TestCase
         $this->withHeader('Origin', 'http://localhost:5173')->postJson('/api/login', [
             'email' => 'waiter@digimenu.test',
             'password' => 'secret-password',
-        ])->assertUnprocessable();
+        ])
+            ->assertOk()
+            ->assertJsonPath('user.email', 'waiter@digimenu.test')
+            ->assertJsonPath('user.role', 'waiter');
 
-        $this->assertGuest();
+        $this->assertAuthenticated();
     }
 }

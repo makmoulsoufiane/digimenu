@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Manager;
 use App\Models\Menu;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -135,8 +136,12 @@ class DatabaseSeeder extends Seeder
             $items = $menuData['items'];
             unset($menuData['items']);
 
+            $menuData['manager_id'] = Manager::query()->first()->id;
+
             $menu = Menu::create($menuData);
             $menu->items()->createMany($items);
         }
+
+        $this->call(RestaurantTableSeeder::class);
     }
 }

@@ -7,32 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Menu extends Model
+class RestaurantTable extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'manager_id',
-        'name',
-        'description',
-        'start_time',
-        'end_time',
-        'days',
+        'code',
+        'table_number',
+        'capacity',
         'status',
-        'icon',
-        'image_url',
     ];
 
-    protected function casts(): array
+    public function visits(): HasMany
     {
-        return [
-            'days' => 'array',
-        ];
-    }
-
-    public function items(): HasMany
-    {
-        return $this->hasMany(MenuItem::class);
+        return $this->hasMany(Visit::class);
     }
 
     public function manager(): BelongsTo

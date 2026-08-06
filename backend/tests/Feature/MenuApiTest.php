@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Manager;
 use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,6 +16,7 @@ class MenuApiTest extends TestCase
     public function test_menus_can_be_listed_with_items(): void
     {
         $menu = Menu::create([
+            'manager_id' => Manager::query()->first()->id,
             'name' => 'Lunch',
             'description' => 'Afternoon dishes.',
             'start_time' => '12:00',
@@ -90,6 +92,7 @@ class MenuApiTest extends TestCase
         Sanctum::actingAs(User::factory()->create());
 
         $menu = Menu::create([
+            'manager_id' => Manager::query()->first()->id,
             'name' => 'Dinner',
             'description' => 'Evening dishes.',
             'start_time' => '18:00',

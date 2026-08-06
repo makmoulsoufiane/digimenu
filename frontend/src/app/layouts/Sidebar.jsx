@@ -5,7 +5,8 @@ import { ROUTES } from '../../shared/constants/routes'
 
 const navigation = [
   { label: 'Overview', icon: 'dashboard', to: ROUTES.dashboard, end: true },
-  { label: 'Menus', icon: 'menus', to: ROUTES.menus },
+  { label: 'Orders', icon: 'bell', to: ROUTES.orders },
+  { label: 'Menus', icon: 'menus', to: ROUTES.menus, managerOnly: true },
 ]
 
 function SidebarContent({ onClose }) {
@@ -50,7 +51,9 @@ function SidebarContent({ onClose }) {
           Workspace
         </p>
         <ul className="mt-3 space-y-1">
-          {navigation.map((item) => (
+          {navigation
+            .filter((item) => !item.managerOnly || user?.role === 'manager')
+            .map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
@@ -73,9 +76,9 @@ function SidebarContent({ onClose }) {
 
         <div className="mx-3 my-6 h-px bg-white/10" />
         <div className="rounded-lg bg-[#0e4053] px-4 py-4">
-          <p className="text-xs font-bold">MVP workspace</p>
+          <p className="text-xs font-bold">Restaurant workflow</p>
           <p className="mt-1 text-[11px] leading-5 text-[#a9c5cf]">
-            Menu and product management only.
+            Menus, table ordering, and waiter order tracking.
           </p>
         </div>
       </nav>
@@ -89,7 +92,9 @@ function SidebarContent({ onClose }) {
             <p className="truncate text-xs font-bold">
               {user?.name ?? 'Manager'}
             </p>
-            <p className="mt-0.5 text-[10px] text-[#9fbdc8]">Manager account</p>
+            <p className="mt-0.5 text-[10px] text-[#9fbdc8]">
+              {user?.role === 'waiter' ? 'Waiter account' : 'Manager account'}
+            </p>
           </div>
           <button
             type="button"

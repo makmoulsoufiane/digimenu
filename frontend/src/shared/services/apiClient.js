@@ -1,4 +1,4 @@
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? 'http://localhost:8000'
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? ''
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? `${API_ORIGIN}/api`
 const CSRF_COOKIE_URL =
   import.meta.env.VITE_CSRF_COOKIE_URL ?? `${API_ORIGIN}/sanctum/csrf-cookie`
