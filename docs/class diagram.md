@@ -81,11 +81,12 @@ Table Order_items {
 }
 
 Table Review {
-  id_review integer [pk, increment, not null]
-  id_visit integer [not null]
-  rating integer [not null]
+  id integer [pk, increment, not null]
+  visit_id integer [not null, unique]
+  rating unsignedTinyInteger [not null]
   comment text
   created_at timestamp
+  updated_at timestamp
 }
 
 Ref: Menu.id_manager > Manager.id_manager
@@ -98,4 +99,4 @@ Ref: Orders.id_visit > Visit.id_visit
 Ref: Orders.accepted_by_waiter_id > Waiter.id_waiter
 Ref: Order_items.id_order > Orders.id_order
 Ref: Order_items.id_menu_item > Menu_items.id_menu_item
-Ref: Review.id_visit > Visit.id_visit
+Ref: Review.visit_id > Visit.id_visit
