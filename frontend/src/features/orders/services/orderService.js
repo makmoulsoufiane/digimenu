@@ -15,6 +15,13 @@ export function getCustomerOrder(orderId) {
   return apiRequest(`/orders/${orderId}`)
 }
 
+export function createVisitReview(visitId, reviewData) {
+  return apiRequest(`/visits/${visitId}/review`, {
+    method: 'POST',
+    body: JSON.stringify(reviewData),
+  })
+}
+
 export function getStaffOrders() {
   return apiRequest('/staff/orders')
 }

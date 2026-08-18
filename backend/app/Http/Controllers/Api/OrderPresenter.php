@@ -10,6 +10,11 @@ class OrderPresenter
     {
         return [
             'id' => $order->id,
+            'visit' => [
+                'id' => $order->visit->id,
+                'status' => $order->visit->status,
+                'hasReview' => $order->visit->review !== null,
+            ],
             'status' => $order->status,
             'total' => (float) $order->total,
             'createdAt' => $order->created_at?->toISOString(),

@@ -15,7 +15,7 @@ class StaffOrderController extends Controller
     public function index(): JsonResponse
     {
         $orders = Order::query()
-            ->with(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'waiter'])
+            ->with(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'visit.review', 'waiter'])
             ->whereIn('status', [
                 Order::STATUS_PENDING,
                 Order::STATUS_ACCEPTED,

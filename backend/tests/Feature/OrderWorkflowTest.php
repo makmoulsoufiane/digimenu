@@ -32,6 +32,9 @@ class OrderWorkflowTest extends TestCase
             ],
         ])
             ->assertCreated()
+            ->assertJsonStructure(['order' => ['visit' => ['id']]])
+            ->assertJsonPath('order.visit.status', 'open')
+            ->assertJsonPath('order.visit.hasReview', false)
             ->assertJsonPath('order.status', Order::STATUS_PENDING)
             ->assertJsonPath('order.estimatedDeliveryMinutes', 25)
             ->assertJsonPath('order.table.number', 1)

@@ -49,7 +49,7 @@ class OrderService
 
             $order->items()->createMany($orderItems->all());
 
-            return $order->load(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'waiter']);
+            return $order->load(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'visit.review', 'waiter']);
         });
     }
 
@@ -70,7 +70,7 @@ class OrderService
             default => null,
         };
 
-        return $order->refresh()->load(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'waiter']);
+        return $order->refresh()->load(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'visit.review', 'waiter']);
     }
 
     private function availableItemsById(array $items): Collection

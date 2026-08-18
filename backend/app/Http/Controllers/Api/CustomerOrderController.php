@@ -26,7 +26,7 @@ class CustomerOrderController extends Controller
     {
         return response()->json([
             'order' => OrderPresenter::present(
-                $order->load(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'waiter']),
+                $order->load(['items.menuItem', 'visit.restaurantTable', 'visit.customer', 'visit.review', 'waiter']),
             ),
         ]);
     }

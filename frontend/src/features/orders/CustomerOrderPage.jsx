@@ -4,6 +4,7 @@ import Icon from '../../shared/components/Icon'
 import { formatCurrency } from '../../shared/utils/formatCurrency'
 import {
   createTableOrder,
+  createVisitReview,
   getCustomerOrder,
   getTableMenu,
 } from './services/orderService'
@@ -21,6 +22,9 @@ const CUSTOMER_STATUS_MESSAGES = {
   delivered: 'Your meal was delivered. Enjoy.',
 }
 
+const activeOrderStorageKey = (tableCode) =>
+  `digimenu:table:${tableCode}:active-order`
+
 function CustomerOrderPage() {
   const { tableCode } = useParams()
   const [table, setTable] = useState(null)
@@ -31,6 +35,10 @@ function CustomerOrderPage() {
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [rating, setRating] = useState(5)
+  const [comment, setComment] = useState('')
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
+  const [reviewSubmitted, setReviewSubmitted] = useState(false)
   const deliveredNoticeSent = useRef(false)
 
   const allItems = useMemo(
@@ -64,12 +72,39 @@ function CustomerOrderPage() {
   }, [tableCode])
 
   useEffect(() => {
+    let isMounted = true
+    const storedOrderId = window.localStorage.getItem(
+      activeOrderStorageKey(tableCode),
+    )
+
+    if (!storedOrderId) return undefined
+
+    async function restoreOrder() {
+      try {
+        const data = await getCustomerOrder(storedOrderId)
+        if (!isMounted) return
+        setOrder(data.order)
+        setReviewSubmitted(Boolean(data.order.visit?.hasReview))
+      } catch {
+        window.localStorage.removeItem(activeOrderStorageKey(tableCode))
+      }
+    }
+
+    restoreOrder()
+
+    return () => {
+      isMounted = false
+    }
+  }, [tableCode])
+
+  useEffect(() => {
     if (!order || order.status === 'delivered') return undefined
 
     const intervalId = window.setInterval(async () => {
       try {
         const data = await getCustomerOrder(order.id)
         setOrder(data.order)
+        setReviewSubmitted(Boolean(data.order.visit?.hasReview))
       } catch {
         window.clearInterval(intervalId)
       }
@@ -118,11 +153,44 @@ function CustomerOrderPage() {
         items: selectedItems,
       })
       setOrder(data.order)
+      window.localStorage.setItem(
+        activeOrderStorageKey(tableCode),
+        String(data.order.id),
+      )
       setMessage('Order sent. Waiting for the waiter to accept it.')
     } catch (error) {
       setMessage(error.message)
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  async function submitReview(event) {
+    event.preventDefault()
+    setMessage('')
+
+    if (!order?.visit?.id) {
+      setMessage('The visit could not be identified. Please refresh the page.')
+      return
+    }
+
+    setIsSubmittingReview(true)
+
+    try {
+      await createVisitReview(order.visit.id, {
+        rating: Number(rating),
+        comment: comment.trim() || null,
+      })
+      setReviewSubmitted(true)
+      setOrder((current) => ({
+        ...current,
+        visit: { ...current.visit, hasReview: true },
+      }))
+      setMessage('Thank you for sharing your experience.')
+    } catch (error) {
+      setMessage(error.message)
+    } finally {
+      setIsSubmittingReview(false)
     }
   }
 
@@ -187,6 +255,79 @@ function CustomerOrderPage() {
                 {formatCurrency(order.total)}
               </span>
             </div>
+          </section>
+        ) : null}
+
+        {order?.status === 'delivered' && !reviewSubmitted ? (
+          <form
+            onSubmit={submitReview}
+            className="mt-4 rounded-xl border border-[#dbe3e6] bg-white p-5"
+          >
+            <h2 className="text-lg font-bold">Rate your experience</h2>
+            <p className="mt-1 text-sm leading-6 text-[#62757d]">
+              How was your food and service today?
+            </p>
+
+            <fieldset className="mt-5">
+              <legend className="text-sm font-bold text-[#52676f]">
+                Rating
+              </legend>
+              <div className="mt-2 grid grid-cols-5 gap-2">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setRating(value)}
+                    aria-label={`${value} star${value === 1 ? '' : 's'}`}
+                    aria-pressed={rating === value}
+                    className={`h-11 rounded-lg border text-sm font-bold transition-colors ${
+                      rating === value
+                        ? 'border-[#154f65] bg-[#154f65] text-white'
+                        : 'border-[#d9e2e5] bg-white text-[#52676f] hover:border-[#1b6079]'
+                    }`}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <label className="mt-5 block">
+              <span className="text-sm font-bold text-[#52676f]">
+                Comment <span className="font-normal">(optional)</span>
+              </span>
+              <textarea
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                maxLength={1000}
+                rows={4}
+                placeholder="Tell us what you enjoyed or what we can improve"
+                className="mt-2 w-full resize-y rounded-lg border border-[#d9e2e5] p-3 text-sm outline-none focus:border-[#1b6079] focus:ring-2 focus:ring-[#1b6079]/10"
+              />
+              <span className="mt-1 block text-right text-xs text-[#788990]">
+                {comment.length}/1000
+              </span>
+            </label>
+
+            <button
+              type="submit"
+              disabled={isSubmittingReview}
+              className="mt-4 inline-flex h-11 items-center gap-2 rounded-lg bg-[#154f65] px-5 text-sm font-bold text-white hover:bg-[#0f4154] disabled:opacity-60"
+            >
+              <Icon name="check" size={16} />
+              {isSubmittingReview ? 'Sending...' : 'Send review'}
+            </button>
+          </form>
+        ) : null}
+
+        {order?.status === 'delivered' && reviewSubmitted ? (
+          <section className="mt-4 border-t border-[#dbe3e6] py-5">
+            <h2 className="text-lg font-bold text-[#28633d]">
+              Thank you for your feedback
+            </h2>
+            <p className="mt-1 text-sm text-[#62757d]">
+              Your review has been sent successfully.
+            </p>
           </section>
         ) : null}
 
